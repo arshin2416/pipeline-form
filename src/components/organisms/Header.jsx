@@ -1,5 +1,6 @@
 import React from "react";
 import ApperIcon from "@/components/ApperIcon";
+import Pipeline from "@/components/pages/Pipeline";
 import Button from "@/components/atoms/Button";
 import SearchBar from "@/components/molecules/SearchBar";
 
@@ -9,12 +10,13 @@ const Header = ({
   onSearchChange, 
   showSearch = false,
   onAddContact,
-  onAddDeal 
+  onAddDeal,
+  onLogout
 }) => {
   return (
     <header className="bg-white border-b border-slate-200 px-6 py-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+<div className="flex items-center space-x-4">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg flex items-center justify-center">
               <ApperIcon name="BarChart3" className="w-5 h-5 text-white" />
@@ -47,6 +49,12 @@ const Header = ({
               <ApperIcon name="Plus" className="w-4 h-4 mr-2" />
               Add Deal
             </Button>
+            {onLogout && (
+              <Button onClick={onLogout} size="sm" variant="outline">
+                <ApperIcon name="LogOut" className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            )}
           </div>
         </div>
       </div>

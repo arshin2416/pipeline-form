@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Header from "@/components/organisms/Header";
-import ContactTable from "@/components/organisms/ContactTable";
-import ContactDetail from "@/components/organisms/ContactDetail";
-import ContactModal from "@/components/organisms/ContactModal";
-import DealModal from "@/components/organisms/DealModal";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
+import { useOutletContext } from "react-router-dom";
 import { contactService } from "@/services/api/contactService";
 import { dealService } from "@/services/api/dealService";
 import { activityService } from "@/services/api/activityService";
 import { pipelineService } from "@/services/api/pipelineService";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import DealModal from "@/components/organisms/DealModal";
+import Header from "@/components/organisms/Header";
+import ContactModal from "@/components/organisms/ContactModal";
+import ContactTable from "@/components/organisms/ContactTable";
+import ContactDetail from "@/components/organisms/ContactDetail";
 
 const Contacts = () => {
   const [contacts, setContacts] = useState([]);
@@ -76,27 +77,30 @@ const Contacts = () => {
     setContactDetailOpen(false);
   };
 
-  const handleSaveContact = async (contactData) => {
+const handleSaveContact = async (contactData) => {
     try {
       if (editingContact) {
         const updatedContact = await contactService.update(editingContact.Id, contactData);
-        setContacts(prev => prev.map(c => c.Id === editingContact.Id ? updatedContact : c));
-        if (selectedContact?.Id === editingContact.Id) {
-          setSelectedContact(updatedContact);
+        if (updatedContact) {
+          setContacts(prev => prev.map(c => c.Id === editingContact.Id ? updatedContact : c));
+          if (selectedContact?.Id === editingContact.Id) {
+            setSelectedContact(updatedContact);
+          }
+          toast.success("Contact updated successfully");
         }
-        toast.success("Contact updated successfully");
       } else {
         const newContact = await contactService.create(contactData);
-        setContacts(prev => [...prev, newContact]);
-        toast.success("Contact added successfully");
-        
-        // Log activity
-        await activityService.create({
-          contactId: newContact.Id,
-          dealId: null,
-          type: "contact_created",
-          description: `New contact "${newContact.name}" was added`
-        });
+        if (newContact) {
+          setContacts(prev => [...prev, newContact]);
+          toast.success("Contact added successfully");
+          
+          await activityService.create({
+            contactId: newContact.Id,
+            dealId: null,
+            type: "contact_created",
+            description: `New contact "${newContact.name}" was added`
+          });
+        }
       }
       setContactModalOpen(false);
       setEditingContact(null);
@@ -136,25 +140,32 @@ const Contacts = () => {
     setDealModalOpen(true);
   };
 
-  const handleSaveDeal = async (dealData) => {
+const handleSaveDeal = async (dealData) => {
     try {
       const newDeal = await dealService.create(dealData);
-      setDeals(prev => [...prev, newDeal]);
-      toast.success("Deal added successfully");
-      
-      // Log activity
-      await activityService.create({
-        contactId: newDeal.contactId,
-        dealId: newDeal.Id,
-        type: "deal_created",
-        description: `New deal "${newDeal.title}" was created`
-      });
+      if (newDeal) {
+        setDeals(prev => [...prev, newDeal]);
+        toast.success("Deal added successfully");
+        
+        // Log activity
+        await activityService.create({
+          contactId: newDeal.contactId,
+          dealId: newDeal.Id,
+          type: "deal_created",
+          description: `New deal "${newDeal.title}" was created`
+        });
+      }
       
       setDealModalOpen(false);
     } catch (error) {
       toast.error("Failed to save deal");
       console.error("Error saving deal:", error);
     }
+  };
+
+  const handleCloseDetail = () => {
+    setContactDetailOpen(false);
+    setSelectedContact(null);
   };
 
   if (loading) {
@@ -193,7 +204,7 @@ const Contacts = () => {
     );
   }
 
-  return (
+return (
     <div className="min-h-screen bg-slate-50">
       <Header 
         title="Contacts" 
@@ -208,40 +219,42 @@ const Contacts = () => {
         <ContactTable
           contacts={filteredContacts}
           deals={deals}
-          loading={false}
-          selectedContact={selectedContact}
           onSelectContact={handleSelectContact}
           onEditContact={handleEditContact}
           onDeleteContact={handleDeleteContact}
-          onAddContact={handleAddContact}
+          selectedContact={selectedContact}
+        />
+
+        <ContactDetail
+          isOpen={contactDetailOpen}
+          contact={selectedContact}
+          deals={deals}
+          activities={activities}
+          onClose={handleCloseDetail}
+          onEdit={handleEditContact}
+        />
+
+        <ContactModal
+          isOpen={contactModalOpen}
+          onClose={() => {
+            setContactModalOpen(false);
+            setEditingContact(null);
+          }}
+          onSubmit={handleSaveContact}
+          contact={editingContact}
+          title={editingContact ? "Edit Contact" : "Add Contact"}
+        />
+
+        <DealModal
+          isOpen={dealModalOpen}
+          onClose={() => setDealModalOpen(false)}
+          onSubmit={handleSaveDeal}
+          deal={null}
+          contacts={contacts}
+          stages={stages}
+          title="Add Deal"
         />
       </div>
-
-      <ContactDetail
-        contact={selectedContact}
-        deals={deals}
-        activities={activities}
-        isOpen={contactDetailOpen}
-        onClose={() => setContactDetailOpen(false)}
-        onEditContact={handleEditContact}
-      />
-
-      <ContactModal
-        isOpen={contactModalOpen}
-        onClose={() => setContactModalOpen(false)}
-        onSave={handleSaveContact}
-        contact={editingContact}
-        title={editingContact ? "Edit Contact" : "Add Contact"}
-      />
-
-      <DealModal
-        isOpen={dealModalOpen}
-        onClose={() => setDealModalOpen(false)}
-        onSave={handleSaveDeal}
-        contacts={contacts}
-        stages={stages}
-        title="Add Deal"
-      />
     </div>
   );
 };

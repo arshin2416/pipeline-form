@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
-import Header from "@/components/organisms/Header";
-import StatCard from "@/components/molecules/StatCard";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import ContactModal from "@/components/organisms/ContactModal";
-import DealModal from "@/components/organisms/DealModal";
-import ApperIcon from "@/components/ApperIcon";
+import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { dealService } from "@/services/api/dealService";
 import { contactService } from "@/services/api/contactService";
 import { pipelineService } from "@/services/api/pipelineService";
-import { formatCurrency } from "@/utils/formatters";
 import { toast } from "react-toastify";
+import { formatCurrency } from "@/utils/formatters";
+import ApperIcon from "@/components/ApperIcon";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import Pipeline from "@/components/pages/Pipeline";
+import StatCard from "@/components/molecules/StatCard";
+import DealModal from "@/components/organisms/DealModal";
+import Header from "@/components/organisms/Header";
+import ContactModal from "@/components/organisms/ContactModal";
 
 const Analytics = () => {
   const [deals, setDeals] = useState([]);
@@ -81,19 +83,24 @@ const Analytics = () => {
     };
   };
 
-  const handleAddContact = async (contactData) => {
+const handleAddContact = async (contactData) => {
     try {
       const newContact = await contactService.create(contactData);
-      setContacts(prev => [...prev, newContact]);
-      toast.success("Contact added successfully");
+      if (newContact) {
+        setContacts(prev => [...prev, newContact]);
+        toast.success("Contact added successfully");
+      }
       setContactModalOpen(false);
     } catch (error) {
-      toast.error("Failed to add contact");
       console.error("Error adding contact:", error);
+      toast.error("Failed to add contact");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAddDeal = async (dealData) => {
+const handleDealSubmit = async (dealData) => {
+    setLoading(true);
     try {
       const newDeal = await dealService.create(dealData);
       setDeals(prev => [...prev, newDeal]);
@@ -102,6 +109,8 @@ const Analytics = () => {
     } catch (error) {
       toast.error("Failed to add deal");
       console.error("Error adding deal:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -283,10 +292,10 @@ const Analytics = () => {
         title="Add Contact"
       />
 
-      <DealModal
+<DealModal
         isOpen={dealModalOpen}
         onClose={() => setDealModalOpen(false)}
-        onSave={handleAddDeal}
+        onSave={handleDealSubmit}
         contacts={contacts}
         stages={stages}
         title="Add Deal"

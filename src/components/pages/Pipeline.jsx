@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Header from "@/components/organisms/Header";
-import PipelineBoard from "@/components/organisms/PipelineBoard";
-import ContactModal from "@/components/organisms/ContactModal";
-import DealModal from "@/components/organisms/DealModal";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
+import { useOutletContext } from "react-router-dom";
 import { dealService } from "@/services/api/dealService";
 import { contactService } from "@/services/api/contactService";
 import { pipelineService } from "@/services/api/pipelineService";
 import { activityService } from "@/services/api/activityService";
+import Loading from "@/components/ui/Loading";
+import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
+import DealModal from "@/components/organisms/DealModal";
+import Header from "@/components/organisms/Header";
+import ContactModal from "@/components/organisms/ContactModal";
+import PipelineBoard from "@/components/organisms/PipelineBoard";
 
 const Pipeline = () => {
   const [deals, setDeals] = useState([]);
@@ -29,11 +30,16 @@ const Pipeline = () => {
     setLoading(true);
     setError("");
     try {
-      const [dealsData, contactsData, stagesData] = await Promise.all([
+const [dealsData, contactsData, stagesData] = await Promise.all([
         dealService.getAll(),
         contactService.getAll(),
         pipelineService.getStages()
       ]);
+      
+      if (!dealsData || !contactsData || !stagesData) {
+        setError("Failed to load initial data");
+        return;
+      }
       setDeals(dealsData);
       setContacts(contactsData);
       setStages(stagesData);
@@ -62,8 +68,10 @@ const Pipeline = () => {
   const handleSaveContact = async (contactData) => {
     try {
       if (editingContact) {
-        const updatedContact = await contactService.update(editingContact.Id, contactData);
-        setContacts(prev => prev.map(c => c.Id === editingContact.Id ? updatedContact : c));
+const updatedContact = await contactService.update(editingContact.Id, contactData);
+        if (updatedContact) {
+          setContacts(prev => prev.map(c => c.Id === editingContact.Id ? updatedContact : c));
+        }
         toast.success("Contact updated successfully");
       } else {
         const newContact = await contactService.create(contactData);
@@ -91,29 +99,30 @@ const Pipeline = () => {
   const handleSaveDeal = async (dealData) => {
     try {
       if (editingDeal) {
-        const updatedDeal = await dealService.update(editingDeal.Id, dealData);
-        setDeals(prev => prev.map(d => d.Id === editingDeal.Id ? updatedDeal : d));
-        toast.success("Deal updated successfully");
-        
-        // Log activity
-        await activityService.create({
-          contactId: updatedDeal.contactId,
-          dealId: updatedDeal.Id,
-          type: "deal_updated",
-          description: `Deal "${updatedDeal.title}" was updated`
-        });
+const updatedDeal = await dealService.update(editingDeal.Id, dealData);
+        if (updatedDeal) {
+          setDeals(prev => prev.map(d => d.Id === editingDeal.Id ? updatedDeal : d));
+          toast.success("Deal updated successfully");
+          
+          await activityService.create({
+            contactId: updatedDeal.contactId,
+            dealId: updatedDeal.Id,
+            type: "deal_updated",
+            description: `Deal "${updatedDeal.title}" was updated`
+          });
+        }
       } else {
         const newDeal = await dealService.create(dealData);
-        setDeals(prev => [...prev, newDeal]);
-        toast.success("Deal added successfully");
-        
-        // Log activity
-        await activityService.create({
-          contactId: newDeal.contactId,
-          dealId: newDeal.Id,
-          type: "deal_created",
-          description: `New deal "${newDeal.title}" was created`
-        });
+        if (newDeal) {
+          setDeals(prev => [...prev, newDeal]);
+          toast.success("Deal added successfully");
+await activityService.create({
+            contactId: newDeal.contactId,
+            dealId: newDeal.Id,
+            type: "deal_created",
+            description: `New deal "${newDeal.title}" was created`
+          });
+        }
       }
       setDealModalOpen(false);
       setEditingDeal(null);
@@ -138,17 +147,18 @@ const Pipeline = () => {
 
   const handleMoveDeal = async (dealId, newStage) => {
     try {
-      const updatedDeal = await dealService.moveToStage(dealId, newStage);
-      setDeals(prev => prev.map(d => d.Id === dealId ? updatedDeal : d));
-      toast.success(`Deal moved to ${newStage}`);
-      
-      // Log activity
-      await activityService.create({
-        contactId: updatedDeal.contactId,
-        dealId: updatedDeal.Id,
-        type: "deal_updated",
-        description: `Deal moved to ${newStage} stage`
-      });
+const updatedDeal = await dealService.moveToStage(dealId, newStage);
+      if (updatedDeal) {
+        setDeals(prev => prev.map(d => d.Id === dealId ? updatedDeal : d));
+        toast.success(`Deal moved to ${newStage}`);
+        
+        await activityService.create({
+          contactId: updatedDeal.contactId,
+          dealId: updatedDeal.Id,
+          type: "deal_updated",
+          description: `Deal moved to ${newStage} stage`
+        });
+      }
     } catch (error) {
       toast.error("Failed to move deal");
       console.error("Error moving deal:", error);
@@ -183,7 +193,7 @@ const Pipeline = () => {
           description="Start tracking your sales opportunities by adding your first deal"
           actionLabel="Add First Deal"
           onAction={handleAddDeal}
-          className="p-16"
+className="p-16"
         />
         <ContactModal
           isOpen={contactModalOpen}
@@ -208,16 +218,14 @@ const Pipeline = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       <Header title="Pipeline" onAddContact={handleAddContact} onAddDeal={handleAddDeal} />
-      
       <PipelineBoard
         deals={deals}
-        contacts={contacts}
         stages={stages}
+        contacts={contacts}
         onEditDeal={handleEditDeal}
         onDeleteDeal={handleDeleteDeal}
         onMoveDeal={handleMoveDeal}
       />
-
       <ContactModal
         isOpen={contactModalOpen}
         onClose={() => setContactModalOpen(false)}
@@ -225,7 +233,6 @@ const Pipeline = () => {
         contact={editingContact}
         title={editingContact ? "Edit Contact" : "Add Contact"}
       />
-
       <DealModal
         isOpen={dealModalOpen}
         onClose={() => setDealModalOpen(false)}
