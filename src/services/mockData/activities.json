@@ -1,0 +1,92 @@
+[
+  {
+    "Id": 1,
+    "contactId": 1,
+    "dealId": 1,
+    "type": "call",
+    "description": "Initial discovery call - discussed current pain points and requirements",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "createdBy": "Sales Rep"
+  },
+  {
+    "Id": 2,
+    "contactId": 1,
+    "dealId": 1,
+    "type": "email",
+    "description": "Sent product demo video and pricing information",
+    "timestamp": "2024-01-16T14:20:00Z",
+    "createdBy": "Sales Rep"
+  },
+  {
+    "Id": 3,
+    "contactId": 1,
+    "dealId": 1,
+    "type": "meeting",
+    "description": "Product demonstration meeting with technical team",
+    "timestamp": "2024-01-18T15:00:00Z",
+    "createdBy": "Sales Engineer"
+  },
+  {
+    "Id": 4,
+    "contactId": 1,
+    "dealId": 1,
+    "type": "email",
+    "description": "Formal proposal sent with customized implementation plan",
+    "timestamp": "2024-01-20T09:15:00Z",
+    "createdBy": "Sales Rep"
+  },
+  {
+    "Id": 5,
+    "contactId": 2,
+    "dealId": 2,
+    "type": "call",
+    "description": "Technical requirements discussion for CRM integration",
+    "timestamp": "2024-01-16T11:30:00Z",
+    "createdBy": "Technical Consultant"
+  },
+  {
+    "Id": 6,
+    "contactId": 2,
+    "dealId": 2,
+    "type": "meeting",
+    "description": "Integration workshop with development team",
+    "timestamp": "2024-01-19T14:00:00Z",
+    "createdBy": "Technical Consultant"
+  },
+  {
+    "Id": 7,
+    "contactId": 3,
+    "dealId": 3,
+    "type": "call",
+    "description": "Budget discussion and startup discount options",
+    "timestamp": "2024-01-17T16:45:00Z",
+    "createdBy": "Sales Rep"
+  },
+  {
+    "Id": 8,
+    "contactId": 4,
+    "dealId": 4,
+    "type": "email",
+    "description": "Initial outreach and company introduction",
+    "timestamp": "2024-01-18T11:30:00Z",
+    "createdBy": "Business Development"
+  },
+  {
+    "Id": 9,
+    "contactId": 5,
+    "dealId": 5,
+    "type": "call",
+    "description": "Marketing analytics requirements gathering",
+    "timestamp": "2024-01-19T15:15:00Z",
+    "createdBy": "Product Specialist"
+  },
+  {
+    "Id": 10,
+    "contactId": 6,
+    "dealId": 6,
+    "type": "meeting",
+    "description": "Contract signing and implementation kickoff",
+    "timestamp": "2024-01-23T16:00:00Z",
+    "createdBy": "Account Manager"
+  }
+]

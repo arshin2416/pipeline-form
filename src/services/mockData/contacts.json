@@ -1,0 +1,62 @@
+[
+  {
+    "Id": 1,
+    "name": "Sarah Chen",
+    "company": "TechCorp Solutions",
+    "email": "sarah.chen@techcorp.com",
+    "phone": "(555) 123-4567",
+    "notes": "Key decision maker for enterprise software. Interested in scaling their operations.",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "lastContactDate": "2024-01-20T14:15:00Z"
+  },
+  {
+    "Id": 2,
+    "name": "Michael Rodriguez",
+    "company": "Digital Dynamics",
+    "email": "m.rodriguez@digitaldynamics.com",
+    "phone": "(555) 234-5678",
+    "notes": "CTO at Digital Dynamics. Looking for CRM integration with existing tools.",
+    "createdAt": "2024-01-16T09:45:00Z",
+    "lastContactDate": "2024-01-18T11:30:00Z"
+  },
+  {
+    "Id": 3,
+    "name": "Emily Johnson",
+    "company": "StartupHub Inc",
+    "email": "emily@startuphub.com",
+    "phone": "(555) 345-6789",
+    "notes": "Founder of a growing startup. Budget conscious but sees value in good tools.",
+    "createdAt": "2024-01-17T16:20:00Z",
+    "lastContactDate": "2024-01-19T13:45:00Z"
+  },
+  {
+    "Id": 4,
+    "name": "David Park",
+    "company": "Enterprise Global",
+    "email": "d.park@enterpriseglobal.com",
+    "phone": "(555) 456-7890",
+    "notes": "VP of Sales. Needs to manage a team of 50+ sales reps across multiple regions.",
+    "createdAt": "2024-01-18T11:15:00Z",
+    "lastContactDate": "2024-01-22T10:20:00Z"
+  },
+  {
+    "Id": 5,
+    "name": "Lisa Thompson",
+    "company": "GrowthCo",
+    "email": "lisa.thompson@growthco.com",
+    "phone": "(555) 567-8901",
+    "notes": "Marketing Director interested in lead tracking and conversion analytics.",
+    "createdAt": "2024-01-19T14:30:00Z",
+    "lastContactDate": "2024-01-21T09:15:00Z"
+  },
+  {
+    "Id": 6,
+    "name": "James Wilson",
+    "company": "Innovation Labs",
+    "email": "james.wilson@innovationlabs.com",
+    "phone": "(555) 678-9012",
+    "notes": "Product Manager evaluating CRM solutions for their product team workflows.",
+    "createdAt": "2024-01-20T08:45:00Z",
+    "lastContactDate": "2024-01-23T15:30:00Z"
+  }
+]
