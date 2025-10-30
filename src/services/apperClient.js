@@ -201,5 +201,3 @@ export const apperClientSingleton = {
 };
 
 export default getSingleton;
-
-export default getSingleton;
