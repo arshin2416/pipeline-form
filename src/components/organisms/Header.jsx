@@ -3,6 +3,7 @@ import ApperIcon from "@/components/ApperIcon";
 import Pipeline from "@/components/pages/Pipeline";
 import Button from "@/components/atoms/Button";
 import SearchBar from "@/components/molecules/SearchBar";
+import StandaloneUploaderExample from "@/components/atoms/FileUploader/StandaloneUploaderExample";
 
 const Header = ({ 
   title, 
@@ -41,6 +42,7 @@ const Header = ({
             />
           )}
           <div className="flex items-center space-x-2">
+          <StandaloneUploaderExample />
             <Button onClick={onAddContact} size="sm" variant="secondary">
               <ApperIcon name="UserPlus" className="w-4 h-4 mr-2" />
               Add Contact

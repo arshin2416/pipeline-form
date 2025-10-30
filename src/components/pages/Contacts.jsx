@@ -110,6 +110,31 @@ const handleSaveContact = async (contactData) => {
     }
   };
 
+  const handleUpdateContact = async (contactId, contactData) => {
+    try {
+      const updatedContact = await contactService.update(contactId, contactData);
+      if (updatedContact) {
+        setContacts(prev => prev.map(c => c.Id === contactId ? updatedContact : c));
+        if (selectedContact?.Id === contactId) {
+          setSelectedContact(updatedContact);
+        }
+        toast.success("Contact updated successfully");
+        
+        // Log activity
+        await activityService.create({
+          contactId: updatedContact.Id,
+          dealId: null,
+          type: "contact_updated",
+          description: `Contact "${updatedContact.name}" was updated`
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to update contact");
+      console.error("Error updating contact:", error);
+      throw error; // Re-throw so the row can handle the error state
+    }
+  };
+
   const handleDeleteContact = async (contactId) => {
     if (!window.confirm("Are you sure you want to delete this contact? This will also delete all associated deals.")) return;
     
@@ -222,6 +247,7 @@ return (
           onSelectContact={handleSelectContact}
           onEditContact={handleEditContact}
           onDeleteContact={handleDeleteContact}
+          onUpdateContact={handleUpdateContact}
           selectedContact={selectedContact}
         />
 
@@ -240,7 +266,7 @@ return (
             setContactModalOpen(false);
             setEditingContact(null);
           }}
-          onSubmit={handleSaveContact}
+          onSave={handleSaveContact}
           contact={editingContact}
           title={editingContact ? "Edit Contact" : "Add Contact"}
         />

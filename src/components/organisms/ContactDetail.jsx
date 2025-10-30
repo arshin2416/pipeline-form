@@ -4,6 +4,8 @@ import Button from "@/components/atoms/Button";
 import Badge from "@/components/atoms/Badge";
 import ActivityItem from "@/components/molecules/ActivityItem";
 import ApperIcon from "@/components/ApperIcon";
+import ApperFileFieldComponent from "@/components/atoms/FileUploader/ApperFileFieldComponent";
+import StandaloneUploaderExample from "@/components/atoms/FileUploader/StandaloneUploaderExample";
 import { formatDate } from "@/utils/formatters";
 import { cn } from "@/utils/cn";
 
@@ -13,9 +15,31 @@ const ContactDetail = ({
   activities, 
   isOpen, 
   onClose, 
-  onEditContact 
+  onEdit 
 }) => {
   const [activeTab, setActiveTab] = useState("info");
+  const [originalFiles1C, setOriginalFiles1C] = useState([]);
+  const [originalFiles3C, setOriginalFiles3C] = useState([]);
+
+  // Load original files when contact changes
+  useEffect(() => {
+    if (contact) {
+      
+      // Store original files_1_c data
+      if (contact.files_1_c && Array.isArray(contact.files_1_c)) {
+        setOriginalFiles1C(contact.files_1_c);
+      } else {
+        setOriginalFiles1C([]);
+      }
+      
+      // Store original files_3_c data
+      if (contact.files_3_c && Array.isArray(contact.files_3_c)) {
+        setOriginalFiles3C(contact.files_3_c);
+      } else {
+        setOriginalFiles3C([]);
+      }
+    }
+  }, [contact]);
 
   const contactDeals = deals.filter(deal => deal.contactId === contact?.Id);
   const contactActivities = activities
@@ -73,7 +97,7 @@ const ContactDetail = ({
             <div className="p-6 space-y-6">
               <div className="flex justify-end">
                 <Button
-                  onClick={() => onEditContact(contact)}
+                  onClick={() => onEdit(contact)}
                   size="sm"
                   variant="secondary"
                 >
@@ -104,6 +128,52 @@ const ContactDetail = ({
                 <div>
                   <label className="text-sm font-medium text-slate-500">Created</label>
                   <p className="text-slate-900">{formatDate(contact.createdAt)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-500 mb-2 block">Files 1 </label>
+                  <ApperFileFieldComponent
+                    elementId="files_1_c"
+                    config={{
+                      fieldId: 'files_1_c',
+                      tableNameOrId: 'contact_c',
+                      fieldNameOrId: 'files_1_c',
+                      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+                      apperPublicKey: '123',
+                      existingFiles: originalFiles1C,
+                      fileCount: 2,
+                      uploadButtonConfig:{
+                        hidden: true,
+                        disabled: false,
+                      },
+                      purpose: 'RecordAttachment',
+                      onMetadataLoaded: (metadata) => {
+                      }
+                    }}
+                  />
+                
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-500 mb-2 block">Files 3</label>
+                  <ApperFileFieldComponent
+                    elementId="files_3_c"
+                    config={{
+                      fieldId: 'files_3_c',
+                      tableNameOrId: 'contact_c',
+                      fieldNameOrId: 'files_3_c',
+                      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+                      apperPublicKey: '123',
+                      existingFiles: originalFiles3C,
+                      fileCount: 2, 
+                      uploadButtonConfig:{
+                        hidden: true,
+                        disabled: false,
+                      },
+                      purpose: 'RecordAttachment',
+                      onMetadataLoaded: (metadata) => {
+                      }
+                    }}
+                  />
                 </div>
               </div>
             </div>

@@ -3,6 +3,9 @@ import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
 import ApperIcon from "@/components/ApperIcon";
 import { cn } from "@/utils/cn";
+import ApperFileFieldComponent from "@/components/atoms/FileUploader/ApperFileFieldComponent";
+
+const { ApperFileUploader } = window.ApperSDK;
 
 const ContactModal = ({ 
   isOpen, 
@@ -16,28 +19,53 @@ const ContactModal = ({
     email: "",
     phone: "",
     company: "",
-    notes: ""
+    notes: "",
+    files_1_c: [],
+    files_3_c: []
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [originalFiles1C, setOriginalFiles1C] = useState([]);
+  const [originalFiles3C, setOriginalFiles3C] = useState([]);
 
   useEffect(() => {
+    
     if (contact) {
+      
       setFormData({
         name: contact.name || "",
         email: contact.email || "",
         phone: contact.phone || "",
         company: contact.company || "",
-        notes: contact.notes || ""
+        notes: contact.notes || "",
+        files_1_c: contact.files_1_c || [],
+        files_3_c: contact.files_3_c || []
       });
+      
+      // Store original files data
+      if (contact.files_1_c && Array.isArray(contact.files_1_c)) {
+        setOriginalFiles1C(contact.files_1_c);
+      } else {
+        setOriginalFiles1C([]);
+      }
+      
+      if (contact.files_3_c && Array.isArray(contact.files_3_c)) {
+        setOriginalFiles3C(contact.files_3_c);
+      } else {
+        setOriginalFiles3C([]);
+      }
     } else {
       setFormData({
         name: "",
         email: "",
         phone: "",
         company: "",
-        notes: ""
+        notes: "",
+        files_1_c: [],
+        files_3_c: []
       });
+      setOriginalFiles1C([]);
+      setOriginalFiles3C([]);
     }
     setErrors({});
   }, [contact, isOpen]);
@@ -65,7 +93,21 @@ const ContactModal = ({
 
     setIsSubmitting(true);
     try {
-      await onSave(formData);
+      // Get all files from the file field components
+      const allFiles = ApperFileUploader.FileField.getAllFiles();
+      
+      // Merge form data with files
+      const dataToSave = {
+        ...formData,
+        files_1_c: allFiles.files_1_c || [],
+        files_3_c: allFiles.files_3_c || []
+      };
+      
+      await onSave(dataToSave);
+      
+      // Clear file fields after successful save
+      ApperFileUploader.FileField.clearAll();
+      
       onClose();
     } catch (error) {
       console.error("Error saving contact:", error);
@@ -146,6 +188,55 @@ const ContactModal = ({
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Files 1
+            </label>
+            <ApperFileFieldComponent
+              elementId="files_1_c"
+              config={{
+                fieldId: 'files_1_c',
+                tableNameOrId: 'contact_c',
+                fieldNameOrId: 'files_1_c',
+                apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+                apperPublicKey: '123',
+                existingFiles: originalFiles1C,
+                fileCount: 2, 
+                uploadButtonConfig:{
+                  hidden: false,
+                  disabled: false,
+                },
+                purpose: 'RecordAttachment',
+                onMetadataLoaded: (metadata) => {
+                }
+              }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Files 3
+            </label>
+            <ApperFileFieldComponent
+              elementId="files_3_c"
+              config={{
+                fieldId: 'files_3_c',
+                tableNameOrId: 'contact_c',
+                fieldNameOrId: 'files_3_c',
+                apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+                apperPublicKey: '123',
+                existingFiles: originalFiles3C,
+                fileCount: 2, 
+                uploadButtonConfig:{
+                  hidden: false,
+                  disabled: false,
+                },
+                purpose: 'RecordAttachment',
+                onMetadataLoaded: (metadata) => {
+                }
+              }}
+            />
+          </div>
           <div className="flex justify-end space-x-3 pt-4">
             <Button
               type="button"

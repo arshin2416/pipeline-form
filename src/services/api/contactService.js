@@ -1,5 +1,8 @@
 import { getApperClient } from "@/services/apperClient";
+const { ApperFileUploader } = window.ApperSDK;
+
 const TABLE_NAME = "contact_c";
+
 
 export const contactService = {
   async getAll() {
@@ -18,7 +21,9 @@ export const contactService = {
           { field: { Name: "company_c" } },
           { field: { Name: "notes_c" } },
           { field: { Name: "last_contact_date_c" } },
-          { field: { Name: "CreatedOn" } }
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "files_1_c" } },
+          { field: { Name: "files_3_c" } },
         ],
         orderBy: [{ fieldName: "Id", sorttype: "DESC" }],
         pagingInfo: { limit: 1000, offset: 0 }
@@ -43,7 +48,9 @@ export const contactService = {
         company: contact.company_c,
         notes: contact.notes_c,
         lastContactDate: contact.last_contact_date_c,
-        createdAt: contact.CreatedOn
+        createdAt: contact.CreatedOn,
+        files_1_c: contact.files_1_c || [],
+        files_3_c: contact.files_3_c || []
       }));
     } catch (error) {
       console.error("Error fetching contacts:", error?.response?.data?.message || error);
@@ -67,7 +74,9 @@ export const contactService = {
           { field: { Name: "company_c" } },
           { field: { Name: "notes_c" } },
           { field: { Name: "last_contact_date_c" } },
-          { field: { Name: "CreatedOn" } }
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "files_1_c" } },
+          { field: { Name: "files_3_c" } }
         ]
       };
 
@@ -86,7 +95,9 @@ export const contactService = {
         company: contact.company_c,
         notes: contact.notes_c,
         lastContactDate: contact.last_contact_date_c,
-        createdAt: contact.CreatedOn
+        createdAt: contact.CreatedOn,
+        files_1_c: contact.files_1_c || [],
+        files_3_c: contact.files_3_c || []
       };
     } catch (error) {
       console.error(`Error fetching contact ${id}:`, error?.response?.data?.message || error);
@@ -109,7 +120,9 @@ export const contactService = {
             phone_c: contactData.phone || "",
             company_c: contactData.company,
             notes_c: contactData.notes || "",
-            last_contact_date_c: new Date().toISOString()
+            last_contact_date_c: new Date().toISOString(),
+            files_1_c: ApperFileUploader.toCreateFormat(contactData.files_1_c),
+            files_3_c: ApperFileUploader.toCreateFormat(contactData.files_3_c)
           }
         ]
       };
@@ -139,7 +152,9 @@ export const contactService = {
             company: created.company_c,
             notes: created.notes_c,
             lastContactDate: created.last_contact_date_c,
-            createdAt: created.CreatedOn
+            createdAt: created.CreatedOn,
+            files_1_c: created.files_1_c || [],
+            files_3_c: created.files_3_c || []
           };
         }
       }
@@ -167,6 +182,8 @@ export const contactService = {
       if (contactData.phone !== undefined) updateFields.phone_c = contactData.phone;
       if (contactData.company !== undefined) updateFields.company_c = contactData.company;
       if (contactData.notes !== undefined) updateFields.notes_c = contactData.notes;
+      if (contactData.files_1_c !== undefined) updateFields.files_1_c = ApperFileUploader.toUpdateFormat(contactData.files_1_c);
+      if (contactData.files_3_c !== undefined) updateFields.files_3_c = ApperFileUploader.toUpdateFormat(contactData.files_3_c);
 
       const params = {
         records: [updateFields]
@@ -197,7 +214,9 @@ export const contactService = {
             company: updated.company_c,
             notes: updated.notes_c,
             lastContactDate: updated.last_contact_date_c,
-            createdAt: updated.CreatedOn
+            createdAt: updated.CreatedOn,
+            files_1_c: updated.files_1_c || [],
+            files_3_c: updated.files_3_c || []
           };
         }
       }

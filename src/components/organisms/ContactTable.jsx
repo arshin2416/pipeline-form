@@ -12,6 +12,7 @@ const ContactTable = ({
   onSelectContact, 
   onEditContact, 
   onDeleteContact,
+  onUpdateContact,
   onAddContact 
 }) => {
   const getContactDealCount = (contactId) => {
@@ -56,6 +57,12 @@ const ContactTable = ({
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                 Last Contact
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Files 1
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Files 3
+              </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
                 Actions
               </th>
@@ -70,6 +77,7 @@ const ContactTable = ({
                 onSelect={onSelectContact}
                 onEdit={onEditContact}
                 onDelete={onDeleteContact}
+                onUpdate={onUpdateContact}
                 isSelected={selectedContact?.Id === contact.Id}
               />
             ))}
