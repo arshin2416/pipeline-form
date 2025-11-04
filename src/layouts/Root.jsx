@@ -58,7 +58,7 @@ export default function Root() {
 
   const initializeAuth = async () => {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
 
       if (!apperClient || !window.ApperSDK) {
         console.error('Failed to initialize ApperSDK or ApperClient');
