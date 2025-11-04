@@ -1,6 +1,5 @@
 import { toast } from 'react-toastify';
 import { getApperClient } from "@/services/apperClient";
-import { toast } from 'react-toastify';
 
 const TABLE_NAME = "deal_c";
 
@@ -28,6 +27,10 @@ export const dealService = {
         pagingInfo: { limit: 1000, offset: 0 }
       };
 
+const apperClient = await getApperClient();
+      if (!apperClient) {
+        throw new Error('ApperClient not initialized');
+      }
       const response = await apperClient.fetchRecords(TABLE_NAME, params);
 
       if (!response.success) {
