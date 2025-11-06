@@ -170,11 +170,29 @@ class ApperClientSingleton {
   }
 
   reset() {
-    if (this._client) {
+if (this._client) {
       this._client = null;
     }
     this._sdkCheckAttempts = 0;
   }
+}
+
+// Global function to wait for SDK availability
+window.waitForSDK = async function(maxAttempts = 10) {
+  let attempts = 0;
+  
+  while (attempts < maxAttempts) {
+    if (window.ApperSDK && window.ApperSDK.ApperClient) {
+      return true;
+    }
+    
+    attempts++;
+    const delay = Math.min(100 * Math.pow(2, attempts - 1), 1600); // Exponential backoff
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  
+  console.warn(`SDK not available after ${maxAttempts} attempts`);
+  return false;
 }
 
 let _singletonInstance = null;
