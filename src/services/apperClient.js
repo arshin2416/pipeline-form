@@ -169,8 +169,8 @@ class ApperClientSingleton {
     }
   }
 
-  reset() {
-if (this._client) {
+reset() {
+    if (this._client) {
       this._client = null;
     }
     this._sdkCheckAttempts = 0;

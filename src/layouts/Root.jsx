@@ -56,34 +56,10 @@ export default function Root() {
 
     navigate(redirectUrl, { replace: true });
   }, [isInitialized, user, location.pathname, location.search, navigate]);
-const waitForSDK = () => {
-    return new Promise((resolve, reject) => {
-      const maxAttempts = 50;
-      let attempts = 0;
-      
-      const checkSDK = () => {
-        attempts++;
-        if (window.ApperSDK && window.ApperSDK.ApperUI) {
-          resolve();
-        } else if (attempts >= maxAttempts) {
-          reject(new Error('SDK failed to load within timeout'));
-        } else {
-          setTimeout(checkSDK, 100);
-        }
-      };
-      
-      checkSDK();
-    });
-  };
-
-  const initializeAuth = async () => {
+const initializeAuth = async () => {
     try {
-      // Wait for SDK to be available with retry mechanism
-      await waitForSDK();
-      
       // Wait for SDK to load and get client
       const apperClient = await getApperClient();
-
       if (!apperClient || !window.ApperSDK) {
         console.error('Failed to initialize ApperSDK or ApperClient after SDK loading');
         dispatch(clearUser());
