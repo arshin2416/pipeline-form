@@ -26,7 +26,7 @@ export const dealService = {
         orderBy: [{ fieldName: "Id", sorttype: "DESC" }],
         pagingInfo: { limit: 1000, offset: 0 }
       };
-apperClient = await getApperClient();
+const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error('ApperClient not initialized');
       }
