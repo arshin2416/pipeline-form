@@ -1,6 +1,5 @@
+import { toast } from 'react-toastify';
 import { getApperClient } from "@/services/apperClient";
-import React from "react";
-import Error from "@/components/ui/Error";
 
 const TABLE_NAME = "deal_c";
 
@@ -28,10 +27,21 @@ export const dealService = {
         pagingInfo: { limit: 1000, offset: 0 }
       };
 
+// Check if apperClient is properly initialized
+      if (!apperClient || typeof apperClient.fetchRecords !== 'function') {
+        console.error('ApperClient not properly initialized or SDK not loaded');
+        return {
+          success: false,
+          message: 'Data service not available. Please refresh the page.',
+          data: []
+        };
+      }
+
       const response = await apperClient.fetchRecords(TABLE_NAME, params);
-      
+
       if (!response.success) {
-        console.error(response.message);
+        console.error("Failed to fetch deals:", response.message);
+        toast.error(response.message || "Failed to load deals");
         return [];
       }
 
@@ -51,7 +61,8 @@ export const dealService = {
         createdAt: deal.CreatedOn
       }));
     } catch (error) {
-      console.error("Error fetching deals:", error?.response?.data?.message || error);
+      console.error("Error fetching deals:", error?.response?.data?.message || error.message);
+      toast.error("Failed to load deals");
       return [];
     }
   },
@@ -61,6 +72,11 @@ export const dealService = {
       const apperClient = getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
+      }
+
+      if (!id || isNaN(parseInt(id))) {
+        console.error("Invalid deal ID provided:", id);
+        return null;
       }
 
       const params = {
@@ -77,7 +93,7 @@ export const dealService = {
         ]
       };
 
-      const response = await apperClient.getRecordById(TABLE_NAME, id, params);
+      const response = await apperClient.getRecordById(TABLE_NAME, parseInt(id), params);
 
       if (!response?.data) {
         return null;
@@ -96,7 +112,8 @@ export const dealService = {
         createdAt: deal.CreatedOn
       };
     } catch (error) {
-      console.error(`Error fetching deal ${id}:`, error?.response?.data?.message || error);
+      console.error(`Error fetching deal ${id}:`, error?.response?.data?.message || error.message);
+      toast.error("Failed to load deal");
       return null;
     }
   },
@@ -125,8 +142,9 @@ export const dealService = {
       const response = await apperClient.createRecord(TABLE_NAME, params);
 
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error("Failed to create deal:", response.message);
+        toast.error(response.message || "Failed to create deal");
+        return null;
       }
 
       if (response.results) {
@@ -134,10 +152,16 @@ export const dealService = {
         const failed = response.results.filter(r => !r.success);
 
         if (failed.length > 0) {
-          console.error(`Failed to create ${failed.length} deals:`, failed);
+          console.error(`Failed to create deal:`, failed);
+          failed.forEach(record => {
+            record.errors?.forEach(error => toast.error(`${error.fieldLabel}: ${error.message}`));
+            if (record.message) toast.error(record.message);
+          });
+          return null;
         }
 
         if (successful.length > 0) {
+          toast.success("Deal created successfully");
           const created = successful[0].data;
           return {
             Id: created.Id,
@@ -155,8 +179,9 @@ export const dealService = {
 
       return null;
     } catch (error) {
-      console.error("Error creating deal:", error?.response?.data?.message || error);
-      throw error;
+      console.error("Error creating deal:", error?.response?.data?.message || error.message);
+      toast.error("Failed to create deal");
+      return null;
     }
   },
 
@@ -187,8 +212,9 @@ export const dealService = {
       const response = await apperClient.updateRecord(TABLE_NAME, params);
 
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(`Failed to update deal ${id}:`, response.message);
+        toast.error(response.message || "Failed to update deal");
+        return null;
       }
 
       if (response.results) {
@@ -196,10 +222,16 @@ export const dealService = {
         const failed = response.results.filter(r => !r.success);
 
         if (failed.length > 0) {
-          console.error(`Failed to update ${failed.length} deals:`, failed);
+          console.error(`Failed to update deal ${id}:`, failed);
+          failed.forEach(record => {
+            record.errors?.forEach(error => toast.error(`${error.fieldLabel}: ${error.message}`));
+            if (record.message) toast.error(record.message);
+          });
+          return null;
         }
 
         if (successful.length > 0) {
+          toast.success("Deal updated successfully");
           const updated = successful[0].data;
           return {
             Id: updated.Id,
@@ -217,8 +249,9 @@ export const dealService = {
 
       return null;
     } catch (error) {
-      console.error("Error updating deal:", error?.response?.data?.message || error);
-      throw error;
+      console.error(`Error updating deal ${id}:`, error?.response?.data?.message || error.message);
+      toast.error("Failed to update deal");
+      return null;
     }
   },
 
@@ -236,7 +269,8 @@ export const dealService = {
       const response = await apperClient.deleteRecord(TABLE_NAME, params);
 
       if (!response.success) {
-        console.error(response.message);
+        console.error(`Failed to delete deal ${id}:`, response.message);
+        toast.error(response.message || "Failed to delete deal");
         return false;
       }
 
@@ -245,15 +279,23 @@ export const dealService = {
         const failed = response.results.filter(r => !r.success);
 
         if (failed.length > 0) {
-          console.error(`Failed to delete ${failed.length} deals:`, failed);
+          console.error(`Failed to delete deal ${id}:`, failed);
+          failed.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+          return false;
         }
 
-        return successful.length > 0;
+        if (successful.length > 0) {
+          toast.success("Deal deleted successfully");
+          return true;
+        }
       }
 
       return false;
     } catch (error) {
-      console.error("Error deleting deal:", error?.response?.data?.message || error);
+      console.error(`Error deleting deal ${id}:`, error?.response?.data?.message || error.message);
+      toast.error("Failed to delete deal");
       return false;
     }
   },
@@ -278,8 +320,9 @@ export const dealService = {
       const response = await apperClient.updateRecord(TABLE_NAME, params);
 
       if (!response.success) {
-        console.error(response.message);
-        throw new Error(response.message);
+        console.error(`Failed to move deal to stage:`, response.message);
+        toast.error(response.message || "Failed to move deal");
+        return null;
       }
 
       if (response.results) {
@@ -288,9 +331,14 @@ export const dealService = {
 
         if (failed.length > 0) {
           console.error(`Failed to move ${failed.length} deals:`, failed);
+          failed.forEach(record => {
+            if (record.message) toast.error(record.message);
+          });
+          return null;
         }
 
         if (successful.length > 0) {
+          toast.success("Deal moved successfully");
           const updated = successful[0].data;
           return {
             Id: updated.Id,
@@ -308,8 +356,11 @@ export const dealService = {
 
       return null;
     } catch (error) {
-      console.error("Error moving deal to stage:", error?.response?.data?.message || error);
-throw error;
+      console.error("Error moving deal to stage:", error?.response?.data?.message || error.message);
+      toast.error("Failed to move deal");
+      return null;
     }
   }
 };
+
+export default dealService;
