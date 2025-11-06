@@ -84,7 +84,6 @@ const StandaloneUploaderExample = () => {
         maxFiles: 5,
         maxFileSize: 100 * 1024 * 1024, // 10MB in bytes
         supportedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'docx', 'xlsx'],
-        showRestrictions: true,
         autoUpload: true,
         
         // Callback functions (optional)
