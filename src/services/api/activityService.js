@@ -5,7 +5,7 @@ const TABLE_NAME = "activity_c";
 export const activityService = {
   async getAll() {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -52,7 +52,7 @@ export const activityService = {
 
   async getByContactId(contactId) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -106,7 +106,7 @@ export const activityService = {
 
   async getByDealId(dealId) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -160,7 +160,7 @@ export const activityService = {
 
   async create(activityData) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }

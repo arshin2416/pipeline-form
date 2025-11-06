@@ -6,7 +6,7 @@ const TABLE_NAME = "deal_c";
 export const dealService = {
   async getAll() {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -69,7 +69,7 @@ export const dealService = {
 
   async getById(id) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -120,7 +120,7 @@ export const dealService = {
 
   async create(dealData) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -187,7 +187,7 @@ export const dealService = {
 
   async update(id, dealData) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -257,7 +257,7 @@ export const dealService = {
 
   async delete(id) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -302,7 +302,7 @@ export const dealService = {
 
   async moveToStage(id, newStage) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }

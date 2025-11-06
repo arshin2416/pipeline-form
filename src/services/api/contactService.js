@@ -7,7 +7,7 @@ const TABLE_NAME = "contact_c";
 export const contactService = {
   async getAll() {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -60,7 +60,7 @@ export const contactService = {
 
   async getById(id) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -107,7 +107,7 @@ export const contactService = {
 
   async create(contactData) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -168,7 +168,7 @@ export const contactService = {
 
   async update(id, contactData) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
@@ -230,7 +230,7 @@ export const contactService = {
 
   async delete(id) {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }

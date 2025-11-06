@@ -5,7 +5,7 @@ const TABLE_NAME = "pipeline_stage_c";
 export const pipelineService = {
   async getStages() {
     try {
-      const apperClient = getApperClient();
+      const apperClient = await getApperClient();
       if (!apperClient) {
         throw new Error("ApperClient not initialized");
       }
