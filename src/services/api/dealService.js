@@ -27,6 +27,16 @@ export const dealService = {
         pagingInfo: { limit: 1000, offset: 0 }
       };
 
+// Check if apperClient is properly initialized
+      if (!apperClient || typeof apperClient.fetchRecords !== 'function') {
+        console.error('ApperClient not properly initialized or SDK not loaded');
+        return {
+          success: false,
+          message: 'Data service not available. Please refresh the page.',
+          data: []
+        };
+      }
+
       const response = await apperClient.fetchRecords(TABLE_NAME, params);
 
       if (!response.success) {
