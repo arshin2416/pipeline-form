@@ -95,7 +95,7 @@ const ApperFileFieldComponent = ({
 
   // Update files when existingFiles change (without remounting)
   useEffect(() => {
-    if (!isReady || !window.ApperSDK || !config.fieldId) return;
+    if (!isReady || !window.ApperSDK || !config.fieldKey) return;
     
     // Check if existingFiles have actually changed
     const filesChanged = JSON.stringify(existingFilesRef.current) !== JSON.stringify(existingFiles);
@@ -114,7 +114,7 @@ const ApperFileFieldComponent = ({
           ? ApperFileUploader.toUIFormat(existingFiles)
           : existingFiles;
         
-        ApperFileUploader.FileField.updateFiles(config.fieldId, filesToUpdate);
+        ApperFileUploader.FileField.updateFiles(config.fieldKey, filesToUpdate);
       } catch (err) {
         console.error('Failed to update initial files:', err);
       }
@@ -122,12 +122,12 @@ const ApperFileFieldComponent = ({
       // Clear files if existingFiles is empty
       try {
         const { ApperFileUploader } = window.ApperSDK;
-        ApperFileUploader.FileField.clearField(config.fieldId);
+        ApperFileUploader.FileField.clearField(config.fieldKey);
       } catch (err) {
         console.error('Failed to clear files:', err);
       }
     }
-  }, [existingFiles, isReady, config.fieldId]);
+  }, [existingFiles, isReady, config.fieldKey]);
   
   if (error) {
     return (

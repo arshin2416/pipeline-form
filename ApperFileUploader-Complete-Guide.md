@@ -215,7 +215,7 @@ Used when you want to associate uploaded files with a specific database record:
 * Perfect for forms, detail pages, and data management UIs
 * Uses `ApperFileUploader.FileField.mount()`
 
-#### Pattern 2: Standalone Uploader
+#### Pattern 2: Standalone Uploader (Future Scope)
 
 Used when you want a generic file uploader without automatic record association:
 
@@ -244,11 +244,11 @@ The ApperFileUploader has a defined lifecycle:
 
 | Property | Type | Required | Description |
 |----|----|----|----|
-| `fieldId` | String | Yes | Unique identifier for this file field |
+| `fieldKey` | String | Yes | Unique identifier for this file field |
 | `apperProjectId` | String | Yes | Your Apper project ID |
 | `apperPublicKey` | String | Yes | Your Apper public key |
-| `tableNameOrId` | String | For FileField | Database table name |
-| `fieldNameOrId` | String | For FileField | Database field name |
+| `tableName` | String | For FileField | Database table name |
+| `fieldName` | String | For FileField | Database field name |
 | `existingFiles` | Array | No | Previously uploaded files to display |
 | `uploadConfig` | Object | Yes | Upload configuration with ApperClient |
 
@@ -293,7 +293,7 @@ uploadConfig: {
 
 ---
 
-## Basic Usage Example
+## Basic Usage Example (Future Scope)
 
 ### Simple Standalone File Uploader
 
@@ -554,7 +554,7 @@ const ApperFileFieldComponent = ({
 
   // Update files effect - runs when existingFiles change (without remounting)
   useEffect(() => {
-    if (!isReady || !window.ApperSDK || !config.fieldId) return;
+    if (!isReady || !window.ApperSDK || !config.fieldKey) return;
     
     // Check if existingFiles have actually changed
     const filesChanged = JSON.stringify(existingFilesRef.current) !== JSON.stringify(existingFiles);
@@ -575,7 +575,7 @@ const ApperFileFieldComponent = ({
           ? ApperFileUploader.toUIFormat(existingFiles)
           : existingFiles;
         
-        ApperFileUploader.FileField.updateFiles(config.fieldId, filesToUpdate);
+        ApperFileUploader.FileField.updateFiles(config.fieldKey, filesToUpdate);
       } catch (err) {
         console.error('Failed to update initial files:', err);
       }
@@ -583,12 +583,12 @@ const ApperFileFieldComponent = ({
       // Clear files if existingFiles is empty
       try {
         const { ApperFileUploader } = window.ApperSDK;
-        ApperFileUploader.FileField.clearField(config.fieldId);
+        ApperFileUploader.FileField.clearField(config.fieldKey);
       } catch (err) {
         console.error('Failed to clear files:', err);
       }
     }
-  }, [existingFiles, isReady, config.fieldId]);
+  }, [existingFiles, isReady, config.fieldKey]);
   
   // Error UI
   if (error) {
@@ -690,8 +690,9 @@ const existingFiles = useMemo(() => {
 ```
 
 **Why?** Prevents unnecessary re-renders by only updating when:
-- The number of files changes
-- The first file's ID changes (indicates different files)
+
+* The number of files changes
+* The first file's ID changes (indicates different files)
 
 This is crucial for performance in lists where many file uploaders are rendered.
 
@@ -751,16 +752,17 @@ useEffect(() => {
 ```
 
 **Key Points:**
-- Waits for SDK to load (up to 5 seconds)
-- Uses `mounted` flag to prevent memory leaks
-- Automatically cleans up on unmount
-- Handles errors gracefully
+
+* Waits for SDK to load (up to 5 seconds)
+* Uses `mounted` flag to prevent memory leaks
+* Automatically cleans up on unmount
+* Handles errors gracefully
 
 **5. Dynamic File Updates (Without Remounting)**
 
 ```javascript
 useEffect(() => {
-  if (!isReady || !window.ApperSDK || !config.fieldId) return;
+  if (!isReady || !window.ApperSDK || !config.fieldKey) return;
   
   // Only update if files actually changed
   const filesChanged = JSON.stringify(existingFilesRef.current) !== JSON.stringify(existingFiles);
@@ -776,19 +778,20 @@ useEffect(() => {
       ? ApperFileUploader.toUIFormat(existingFiles)
       : existingFiles;
     
-    ApperFileUploader.FileField.updateFiles(config.fieldId, filesToUpdate);
+    ApperFileUploader.FileField.updateFiles(config.fieldKey, filesToUpdate);
   } else if (existingFiles.length === 0) {
     // Clear all files
-    ApperFileUploader.FileField.clearField(config.fieldId);
+    ApperFileUploader.FileField.clearField(config.fieldKey);
   }
-}, [existingFiles, isReady, config.fieldId]);
+  }, [existingFiles, isReady, config.fieldKey]);
 ```
 
 **Key Points:**
-- Only runs after component is ready
-- Compares files using JSON to detect real changes
-- Handles format conversion (API format with uppercase keys → UI format with lowercase keys)
-- Clears files when empty array is passed
+
+* Only runs after component is ready
+* Compares files using JSON to detect real changes
+* Handles format conversion (API format with uppercase keys → UI format with lowercase keys)
+* Clears files when empty array is passed
 
 **6. Error Display**
 
@@ -821,6 +824,7 @@ Displays a loading spinner while SDK loads and mounts.
 
 This wrapper component solves several critical challenges:
 
+
 1. **Async SDK Loading** - Handles the CDN script loading gracefully with timeout
 2. **Memory Leak Prevention** - Uses `mounted` flag and proper cleanup to prevent state updates on unmounted components
 3. **Performance Optimization** - Memoizes files and compares deeply to avoid unnecessary re-mounts
@@ -829,16 +833,18 @@ This wrapper component solves several critical challenges:
 6. **Developer Experience** - Reduces integration from 30+ lines to just a simple component tag
 
 **File Location in Project:**
+
 ```
 src/components/atoms/FileUploader/ApperFileFieldComponent.jsx
 ```
+
 
 ---
 
 #### Component Props
 
 | Prop | Type | Required | Description |
-|----|----|----|----| 
+|----|----|----|----|
 | `elementId` | String | Yes | Unique identifier for the uploader instance |
 | `config` | Object | Yes | Configuration object (same as ApperFileUploader config) |
 | `className` | String | No | Custom CSS class for styling |
@@ -850,9 +856,9 @@ The `config` prop accepts all standard ApperFileUploader configuration options:
 
 ```javascript
 {
-  fieldId: 'unique-field-id',              // Required: Field identifier
-  tableNameOrId: 'contacts',               // Database table name
-  fieldNameOrId: 'attachments',            // Database field name
+  fieldKey: 'unique-field-id',              // Required: Field identifier
+  tableName: 'contacts',                   // Database table name
+  fieldName: 'attachments',                // Database field name
   apperProjectId: 'your_project_id',       // Your Apper project ID
   apperPublicKey: 'your_public_key',       // Your Apper public key
   existingFiles: [],                       // Previously uploaded files
@@ -881,9 +887,9 @@ const MyComponent = () => {
     <ApperFileFieldComponent
       elementId="contact-files"
       config={{
-        fieldId: 'contact-files',
-        tableNameOrId: 'contacts',
-        fieldNameOrId: 'attachments',
+        fieldKey: 'contact-files',
+        tableName: 'contacts',
+        fieldName: 'attachments',
         apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
         apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY,
         existingFiles: [],
@@ -976,7 +982,7 @@ Displays a loading spinner while the SDK initializes:
 | No loading state | ✅ Loading spinner |
 | Manual cleanup required | ✅ Automatic cleanup |
 | Manual file updates | ✅ Smart updates |
-| ~30-50 lines of code | ✅ 5-10 lines of code |
+| \~30-50 lines of code | ✅ 5-10 lines of code |
 
 ### Remove Scenario: Deleting Files
 
@@ -986,15 +992,15 @@ Files can be removed by the user through the UI, or programmatically:
 // User removes file through UI - handled automatically via onUploadedFilesChanged
 
 // Programmatic removal - clear all files
-const clearFiles = (fieldId) => {
+const clearFiles = (fieldKey) => {
   const { ApperFileUploader } = window.ApperSDK;
-  ApperFileUploader.FileField.clearField(fieldId);
+  ApperFileUploader.FileField.clearField(fieldKey);
 };
 
 // Update with empty array
-const removeAllFiles = (fieldId) => {
+const removeAllFiles = (fieldKey) => {
   const { ApperFileUploader } = window.ApperSDK;
-  ApperFileUploader.FileField.updateFiles(fieldId, []);
+  ApperFileUploader.FileField.updateFiles(fieldKey, []);
 };
 ```
 
@@ -1068,15 +1074,13 @@ const CreateContactForm = ({ onSubmit }) => {
         <ApperFileFieldComponent
           elementId="contact-files"
           config={{
-            fieldId: 'contact-files',
-            tableNameOrId: 'contacts',
-            fieldNameOrId: 'attachments',
+            fieldKey: 'contact-files',
+            tableName: 'contacts',
+            fieldName: 'attachments',
             apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
             apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY,
             existingFiles: [],
             fileCount: 5,
-            maxFileSize: 10 * 1024 * 1024,
-            supportedExtensions: ['pdf', 'jpg', 'png', 'docx'],
             purpose: 'RecordAttachment',
             onUploadedFilesChanged: (files) => {
               setUploadedFiles(files);
@@ -1114,8 +1118,8 @@ const EditContactForm = ({ contact, onUpdate }) => {
   const handleUpdate = async () => {
     // Get updated files from the file field
     const { ApperFileUploader } = window.ApperSDK;
-    const fieldId = `contact-files-${contact.Id}`;
-    const updatedFiles = ApperFileUploader.FileField.getFiles(fieldId) || currentFiles;
+    const fieldKey = `contact-files-${contact.Id}`;
+    const updatedFiles = ApperFileUploader.FileField.getFiles(fieldKey) || currentFiles;
     
     // Update contact with new data and files
     await onUpdate(contact.Id, {
@@ -1155,15 +1159,13 @@ const EditContactForm = ({ contact, onUpdate }) => {
         <ApperFileFieldComponent
           elementId={`contact-files-${contact.Id}`}
           config={{
-            fieldId: `contact-files-${contact.Id}`,
-            tableNameOrId: 'contacts',
-            fieldNameOrId: 'attachments',
+            fieldKey: `contact-files-${contact.Id}`,
+            tableName: 'contacts',
+            fieldName: 'attachments',
             apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
             apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY,
             existingFiles: contact.files || [], // Show existing files
             fileCount: 5,
-            maxFileSize: 10 * 1024 * 1024,
-            supportedExtensions: ['pdf', 'jpg', 'png', 'docx'],
             purpose: 'RecordAttachment',
             onUploadedFilesChanged: (files) => {
               setCurrentFiles(files);
@@ -1205,10 +1207,10 @@ const ContactTableRow = ({ contact, onUpdate, onRowClick }) => {
     setIsSaving(true);
     try {
       const { ApperFileUploader } = window.ApperSDK;
-      const fieldId = `files-${contact.Id}`;
+      const fieldKey = `files-${contact.Id}`;
       
       // Get current files from uploader
-      const updatedFiles = ApperFileUploader.FileField.getFiles(fieldId) || currentFiles;
+      const updatedFiles = ApperFileUploader.FileField.getFiles(fieldKey) || currentFiles;
       
       // Update contact with new files
       await onUpdate(contact.Id, { files: updatedFiles });
@@ -1238,16 +1240,14 @@ const ContactTableRow = ({ contact, onUpdate, onRowClick }) => {
           <ApperFileFieldComponent
             elementId={`files-${contact.Id}`}
             config={{
-              fieldId: `files-${contact.Id}`,
-              tableNameOrId: 'contacts',
-              fieldNameOrId: 'attachments',
+              fieldKey: `files-${contact.Id}`,
+              tableName: 'contacts',
+              fieldName: 'attachments',
               apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
               apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY,
               existingFiles: originalFiles,
               showUploadedFilesInPopOver: true, // Use popover in tables
               fileCount: 3,
-              maxFileSize: 5 * 1024 * 1024, // 5MB limit for table uploads
-              supportedExtensions: ['pdf', 'jpg', 'png'],
               uploadButtonConfig: {
                 hidden: false,
                 disabled: false,
@@ -1313,9 +1313,9 @@ const MyForm = () => (
   <ApperFileFieldComponent
     elementId="my-files"
     config={{
-      fieldId: 'my-files',
-      tableNameOrId: 'contacts',
-      fieldNameOrId: 'attachments',
+      fieldKey: 'my-files',
+      tableName: 'contacts',
+      fieldName: 'attachments',
       apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
       apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY,
       existingFiles: [],
@@ -1348,11 +1348,12 @@ useEffect(() => {
 ```
 
 **Why use the wrapper?**
-- Reduces code from 30-50 lines to 5-10 lines
-- Automatic error handling and loading states
-- Prevents memory leaks with automatic cleanup
-- Smart updates to avoid unnecessary re-renders
-- Production-ready and battle-tested
+
+* Reduces code from 30-50 lines to 5-10 lines
+* Automatic error handling and loading states
+* Prevents memory leaks with automatic cleanup
+* Smart updates to avoid unnecessary re-renders
+* Production-ready and battle-tested
 
 ### 2. State Management
 
@@ -1510,12 +1511,12 @@ When using multiple file fields on the same page:
 // Use unique field IDs
 <ApperFileFieldComponent
   elementId={`files-1-${recordId}`}
-  config={{ fieldId: `files-1-${recordId}`, ... }}
+  config={{ fieldKey: `files-1-${recordId}`, ... }}
 />
 
 <ApperFileFieldComponent
   elementId={`files-2-${recordId}`}
-  config={{ fieldId: `files-2-${recordId}`, ... }}
+  config={{ fieldKey: `files-2-${recordId}`, ... }}
 />
 ```
 
@@ -1525,7 +1526,7 @@ When using multiple file fields on the same page:
 // Don't reuse field IDs
 <ApperFileFieldComponent
   elementId="files" // Same ID! Will cause conflicts
-  config={{ fieldId: "files", ... }}
+  config={{ fieldKey: "files", ... }}
 />
 ```
 
@@ -1576,7 +1577,7 @@ onUploadedFilesChanged: (files) => {
 },
 
 // Or use getFiles to retrieve them
-const files = ApperFileUploader.FileField.getFiles(fieldId);
+const files = ApperFileUploader.FileField.getFiles(fieldKey);
 setUploadedFiles(files);
 ```
 
@@ -1660,11 +1661,11 @@ useEffect(() => {
 
 ```javascript
 // Use unique field IDs
-const uniqueFieldId = `files-${fieldName}-${recordId}-${Math.random()}`;
+const uniqueFieldKey = `files-${fieldName}-${recordId}-${Math.random()}`;
 
 <ApperFileFieldComponent
-  elementId={uniqueFieldId}
-  config={{ fieldId: uniqueFieldId, ... }}
+  elementId={uniqueFieldKey}
+  config={{ fieldKey: uniqueFieldKey, ... }}
 />
 ```
 
@@ -1680,8 +1681,8 @@ useEffect(() => {
   if (!isReady) return;
   
   const { ApperFileUploader } = window.ApperSDK;
-  ApperFileUploader.FileField.updateFiles(fieldId, existingFiles);
-}, [existingFiles, isReady, fieldId]);
+  ApperFileUploader.FileField.updateFiles(fieldKey, existingFiles);
+}, [existingFiles, isReady, fieldKey]);
 
 // Use JSON comparison for deep equality
 const filesChanged = JSON.stringify(prevFiles) !== JSON.stringify(newFiles);
@@ -1723,13 +1724,13 @@ const apperClient = new ApperClient({
 await ApperFileUploader.FileField.mount('element-id', config);
 
 // Get files from field
-const files = ApperFileUploader.FileField.getFiles('field-id');
+const files = ApperFileUploader.FileField.getFiles('field-key');
 
 // Update files
-ApperFileUploader.FileField.updateFiles('field-id', newFiles);
+ApperFileUploader.FileField.updateFiles('field-key', newFiles);
 
 // Clear files
-ApperFileUploader.FileField.clearField('field-id');
+ApperFileUploader.FileField.clearField('field-key');
 
 // Unmount field
 ApperFileUploader.FileField.unmount('element-id');
@@ -1738,75 +1739,6 @@ ApperFileUploader.FileField.unmount('element-id');
 const uiFiles = ApperFileUploader.toUIFormat(apiFiles);
 ```
 
-### Minimal Working Example
-
-**Using ApperFileFieldComponent (Recommended)**
-
-```javascript
-import React from 'react';
-import ApperFileFieldComponent from './components/atoms/FileUploader/ApperFileFieldComponent';
-
-const MinimalUploader = () => {
-  return (
-    <ApperFileFieldComponent
-      elementId="my-uploader"
-      config={{
-        fieldId: 'my-uploader',
-        tableNameOrId: 'your_table',
-        fieldNameOrId: 'attachments',
-        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
-        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY,
-        existingFiles: [],
-        fileCount: 5,
-        onUploadedFilesChanged: (files) => console.log('Files:', files)
-      }}
-    />
-  );
-};
-
-export default MinimalUploader;
-```
-
-**Using Direct SDK (Advanced)**
-
-```javascript
-import React, { useEffect, useRef } from 'react';
-
-const MinimalUploaderAdvanced = () => {
-  const apperClientRef = useRef(null);
-
-  useEffect(() => {
-    const init = async () => {
-      // Wait for SDK
-      while (!window.ApperSDK) {
-        await new Promise(r => setTimeout(r, 100));
-      }
-      
-      // Initialize client
-      const { ApperClient, ApperFileUploader } = window.ApperSDK;
-      apperClientRef.current = new ApperClient({
-        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
-        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-      });
-      
-      // Mount uploader
-      await ApperFileUploader.showFileUploader('uploader', {
-        uploadConfig: { apperClient: apperClientRef.current },
-        maxFiles: 5,
-        onSuccess: (files) => console.log('Uploaded:', files)
-      });
-    };
-    
-    init();
-  }, []);
-
-  return <div id="uploader" />;
-};
-
-export default MinimalUploaderAdvanced;
-```
-
 
 ---
-
 

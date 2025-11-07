@@ -190,9 +190,9 @@ const ContactRow = ({
             <ApperFileFieldComponent
               elementId={`files_1_c_${contact.Id}`}
               config={{
-                fieldId: `files_1_c_${contact.Id}`,
-                tableNameOrId: 'contact_c',
-                fieldNameOrId: 'files_1_c',
+                fieldKey: `files_1_c_${contact.Id}`,
+                tableName: 'contact_c',
+                fieldName: 'files_1_c',
                 apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
                 apperPublicKey: '123',
                 existingFiles: originalFiles1C,
@@ -216,9 +216,9 @@ const ContactRow = ({
             <ApperFileFieldComponent
               elementId={`files_3_c_${contact.Id}`}
               config={{
-                fieldId: `files_3_c_${contact.Id}`,
-                tableNameOrId: 'contact_c',
-                fieldNameOrId: 'files_3_c',
+                fieldKey: `files_3_c_${contact.Id}`,
+                tableName: 'contact_c',
+                fieldName: 'files_3_c',
                 apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
                 apperPublicKey: '123',
                 existingFiles: originalFiles3C,

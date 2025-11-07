@@ -195,9 +195,9 @@ const ContactModal = ({
             <ApperFileFieldComponent
               elementId="files_1_c"
               config={{
-                fieldId: 'files_1_c',
-                tableNameOrId: 'contact_c',
-                fieldNameOrId: 'files_1_c',
+                fieldKey: 'files_1_c',
+                tableName: 'contact_c',
+                fieldName: 'files_1_c',
                 apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
                 apperPublicKey: '123',
                 existingFiles: originalFiles1C,
@@ -220,9 +220,9 @@ const ContactModal = ({
             <ApperFileFieldComponent
               elementId="files_3_c"
               config={{
-                fieldId: 'files_3_c',
-                tableNameOrId: 'contact_c',
-                fieldNameOrId: 'files_3_c',
+                fieldKey: 'files_3_c',
+                tableName: 'contact_c',
+                fieldName: 'files_3_c',
                 apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
                 apperPublicKey: '123',
                 existingFiles: originalFiles3C,
