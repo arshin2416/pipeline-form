@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 
 const ApperFileFieldComponent = ({ 
@@ -9,40 +7,45 @@ const ApperFileFieldComponent = ({
   style = {}
 }) => {
   
+  // State management
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Refs for tracking component lifecycle and state
   const mountedRef = useRef(false);
   const elementIdRef = useRef(elementId);
   const existingFilesRef = useRef(null);
 
   // Memoize existingFiles to detect actual changes
+  // This prevents unnecessary re-renders when the files array reference changes
+  // but the actual content remains the same
   const existingFiles = useMemo(() => {
-    
     return config.existingFiles || [];
   }, [
     config.existingFiles?.length,
     config.existingFiles?.[0]?.Id || config.existingFiles?.[0]?.id
   ]);
 
+  // Update elementId ref when it changes
   useEffect(() => {
-    // Update ref if elementId changes
     elementIdRef.current = elementId;
   }, [elementId]);
 
+  // Main mounting effect - runs once when component mounts
   useEffect(() => {
     let mounted = true;
 
     const mountFileField = async () => {
-      
       try {
-        // Wait for ApperSDK to be available
+        // Wait for ApperSDK to be available (loaded from CDN)
         let attempts = 0;
-        const maxAttempts = 50;
+        const maxAttempts = 50; // 5 seconds max wait time
 
         while (!window.ApperSDK && attempts < maxAttempts) {
           await new Promise(resolve => setTimeout(resolve, 100));
           attempts++;
         }
+        
         if (!window.ApperSDK) {
           throw new Error('ApperSDK not loaded. Please ensure the SDK script is included before this component.');
         }
@@ -52,12 +55,12 @@ const ApperFileFieldComponent = ({
 
         const { ApperFileUploader } = window.ApperSDK;
 
+        // Create unique element ID
         elementIdRef.current = `file-uploader-${elementId}`;
        
         // Mount the file field with the full config including existingFiles
         await ApperFileUploader.FileField.mount(elementIdRef.current, {
           ...config,
-          // Use memoized existingFiles
           existingFiles: existingFiles
         });
 
@@ -78,7 +81,7 @@ const ApperFileFieldComponent = ({
 
     mountFileField();
 
-    // Cleanup function
+    // Cleanup function - runs when component unmounts
     return () => {
       mounted = false;
       
@@ -91,9 +94,9 @@ const ApperFileFieldComponent = ({
         }
       }
     };
-  }, [elementId, config.existingFiles]); // Only re-mount if elementId changes
+  }, [elementId, config.existingFiles]);
 
-  // Update files when existingFiles change (without remounting)
+  // Update files effect - runs when existingFiles change (without remounting)
   useEffect(() => {
     if (!isReady || !window.ApperSDK || !config.fieldKey) return;
     
@@ -109,7 +112,9 @@ const ApperFileFieldComponent = ({
       try {
         const { ApperFileUploader } = window.ApperSDK;
         
-        // Check if files need conversion from API format
+        // Check if files need conversion from API format to UI format
+        // API format: { Id, Name, Size, Type, Url }
+        // UI format:  { id, name, size, type, url }
         const filesToUpdate = existingFiles[0]?.Id !== undefined
           ? ApperFileUploader.toUIFormat(existingFiles)
           : existingFiles;
@@ -129,6 +134,7 @@ const ApperFileFieldComponent = ({
     }
   }, [existingFiles, isReady, config.fieldKey]);
   
+  // Error UI
   if (error) {
     return (
       <div 
@@ -147,6 +153,7 @@ const ApperFileFieldComponent = ({
     );
   }
 
+  // Main render
   return (
     <div 
       id={`file-uploader-${elementId}`}
@@ -183,4 +190,3 @@ const ApperFileFieldComponent = ({
 };
 
 export default ApperFileFieldComponent;
-
